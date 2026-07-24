@@ -1,0 +1,21 @@
+# Core
+tensorflow==2.19.0
+numpy>=1.24,<2.0
+scipy>=1.10
+
+# Audio / MIR
+librosa>=0.10.1
+mir_eval>=0.7
+soundfile>=0.12
+demucs>=4.0.1          # HTDemucs-FT source separation
+
+# Data handling and analysis
+pandas>=2.0
+matplotlib>=3.7        # figures
+
+# Notes:
+#  - torch is installed as a dependency of demucs; it is used only for source
+#    separation during preprocessing, not for training.
+#  - Training was run with Python 3.10 and CUDA 12.x on an NVIDIA RTX A6000.
+#  - Pin versions with `pip freeze > requirements-lock.txt` on your own machine
+#    if you need an exact environment snapshot.
