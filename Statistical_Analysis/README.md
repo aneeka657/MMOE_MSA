@@ -47,35 +47,6 @@ consistent with the paper's central motivation: task-specific gating
 concentrates capacity on labeling-relevant stem cues without sacrificing
 boundary-detection performance.
 
-After Holm correction across the five metrics, ACCa (0.055) and ACCs (0.133)
-become marginal; both uncorrected and corrected values are reported in
-`significance_report.txt` so that readers can apply their preferred
-criterion.
-
----
-
-## Contents
-
-```
-Statistical_Analysis/
-├── significance_analysis.py      # Aggregation + Wilcoxon signed-rank tests
-├── significance_report.txt       # Full output: means, std, all p-values
-├── per_track_metrics/            # Raw inputs (one CSV per system per seed)
-│   ├── mmoe_seed0.csv
-│   ├── mmoe_seed1.csv
-│   ├── mmoe_seed2.csv
-│   ├── allinone_seed0.csv
-│   ├── allinone_seed1.csv
-│   └── allinone_seed2.csv
-└── README.md
-```
-
-Each CSV contains one row per test track with the columns
-`system, seed, song, F1_05, P_05, R_05, F1_3, P_3, R_3, F1_P, P_pair,
-R_pair, ACCa, ACCs`.
-
----
-
 ## How the inputs were produced
 
 The per-track CSVs were written by the seeded training scripts, which log
