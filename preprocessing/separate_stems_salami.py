@@ -35,8 +35,8 @@ SALAMI_IDS = [2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 306, 307, 308, 30
               1652, 1653, 1654]
 
 # Paths
-INPUT_AUDIO_DIR = "/Scratch/repository/iahmad/salami_pop"
-OUTPUT_BASE_DIR = "/Scratch/repository/iahmad/salami-demucs"
+INPUT_AUDIO_DIR = "/data/SALAMI_MIX"
+OUTPUT_BASE_DIR = "/data/SALAMI_DEMUCS"
 
 STEM_DIRS = {
     'drums': os.path.join(OUTPUT_BASE_DIR, 'drums'),
