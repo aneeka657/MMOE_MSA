@@ -420,9 +420,9 @@ def load_and_combine_processed_files(processed_dir, output_file):
 # === MAIN FUNCTION ===
 def run_salami_preprocessing_no_aug(
     target_song_ids=None,
-    audio_dir="/Scratch/repository/iahmad/beatles-demucs/vocals",
-    annotation_dir="/Scratch/repository/iahmad/beatles-mapping",
-    output_dir="/Scratch/repository/msa/project2/beatles-original-preprocessed-data",
+    audio_dir="/data/beatles_DEMUCS/vocals",
+    annotation_dir="/data/beatles_MAPPED_ANNOTATIONS",
+    output_dir="/data/beatles_Original_Preprocessed_Data",
     final_dataset_path="./beatles_data/test_data.npz",
     max_len=935
 ):
