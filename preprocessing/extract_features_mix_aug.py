@@ -448,9 +448,9 @@ def load_and_combine_processed_files(processed_dir, output_file):
 # === MAIN FUNCTION (FIXED PATHS!) ===
 def run_salami_preprocessing(
     target_song_ids=None,
-    audio_dir="/Scratch/repository/iahmad/beatles",
-    annotation_dir="/Scratch/repository/iahmad/beatles-mapping",  # ← FIXED!
-    output_dir="/Scratch/repository/msa/project2/beatles-aug-preprocessed-data",
+    audio_dir="/data/beatles_MIX",
+    annotation_dir="/data/beatles_MAPPED_ANNOTATIONS",  # ← FIXED!
+    output_dir="/data/beatles-Aug-Preprocessed-Data",
     final_dataset_path="./beatles_data/train_data.npz",
     max_len=935
 ):
