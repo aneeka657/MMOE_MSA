@@ -117,8 +117,8 @@ SALAMI_IDS = ["RM-P002",
         "RM-P098"]
 
 # Paths
-INPUT_AUDIO_DIR = "/Scratch/repository/iahmad/RWC-audio"
-OUTPUT_BASE_DIR = "/Scratch/repository/iahmad/RWC-demucs"
+INPUT_AUDIO_DIR = "/data/RWC_MIX"
+OUTPUT_BASE_DIR = "/data/RWC-DEMUCS"
 
 STEM_DIRS = {
     'drums': os.path.join(OUTPUT_BASE_DIR, 'drums'),
