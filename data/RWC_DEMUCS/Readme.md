@@ -1,1 +1,1 @@
-Demucs will seprate audio into vocals, drums, bass, and others. 
+Demucs will separate audio into vocals, drums, bass, and others. 
