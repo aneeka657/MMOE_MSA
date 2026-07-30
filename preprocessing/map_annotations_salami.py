@@ -10,10 +10,6 @@ import glob
 from pathlib import Path
 from tqdm import tqdm
 
-# Paths
-INPUT_ANNOTATION_DIR = "/Scratch/repository/iahmad/salami_7class_annotations"
-OUTPUT_ANNOTATION_DIR = "/Scratch/repository/iahmad/salami-mapping"
-
 # ============================================================================
 # FILENAME MATCHING
 # ============================================================================
@@ -265,7 +261,7 @@ def main():
     print(f"3. ➡️  Run preprocessing - it will convert to frames internally")
 
 if __name__ == '__main__':
-    INPUT_ANNOTATION_DIR = "/Scratch/repository/iahmad/salami_7class_annotations"
-    OUTPUT_ANNOTATION_DIR = "/Scratch/repository/iahmad/salami-mapping"
+    INPUT_ANNOTATION_DIR = "/data/SALAMI_ANNOTATIONS"
+    OUTPUT_ANNOTATION_DIR = "/data/SALAMI_MAPPED_ANNOTATIONS"
     
     main()
