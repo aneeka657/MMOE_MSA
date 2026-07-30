@@ -191,8 +191,8 @@ SALAMI_IDS = ["11_-_Do_You_Want_To_Know_A_Secret",
         "05_-_Here,_There_And_Everywhere"]
 
 # Paths
-INPUT_AUDIO_DIR = "/Scratch/repository/iahmad/beatles"
-OUTPUT_BASE_DIR = "/Scratch/repository/iahmad/beatles-demucs"
+INPUT_AUDIO_DIR = "/data/beatles_MIX"
+OUTPUT_BASE_DIR = "/data/beatles-DEMUCS"
 
 STEM_DIRS = {
     'drums': os.path.join(OUTPUT_BASE_DIR, 'drums'),
