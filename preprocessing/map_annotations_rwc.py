@@ -117,6 +117,6 @@ def convert_salami_labels(base_dir, output_dir):
     print(f"\n✅ Completed label conversion for {processed} files.")
 
 # Example usage:
-base_salami_annotation_path = "/Scratch/repository/iahmad/rwc-annotations"
-output_mapped_dir = "/Scratch/repository/iahmad/rwc-mapped-annotation"
+base_salami_annotation_path = "/data/RWC_ANNOTATIONS"
+output_mapped_dir = "/data/RWC_MAPPED_ANNOTATIONS"
 convert_salami_labels(base_salami_annotation_path, output_mapped_dir)
