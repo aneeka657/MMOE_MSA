@@ -1,0 +1,8 @@
+model_checkpoint_path: "best-36"
+all_model_checkpoint_paths: "best-30"
+all_model_checkpoint_paths: "best-32"
+all_model_checkpoint_paths: "best-36"
+all_model_checkpoint_timestamps: 1761240927.8786232
+all_model_checkpoint_timestamps: 1761241566.1196814
+all_model_checkpoint_timestamps: 1761243541.0849724
+last_preserved_timestamp: 1755098504.7284088
