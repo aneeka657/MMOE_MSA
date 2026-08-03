@@ -1,26 +1,3 @@
-"""
-MMoE Music Structure Analysis — 5 Experts (SIMI + Tsungping)
-==============================================================
-Professor's experiment: 4 SIMI stem experts + 1 Dual-Attention (Tsungping) expert.
-
-Experts:
-  Expert 0: Vocals+Mix      (SIMI pretrained)
-  Expert 1: Drums+Mix       (SIMI pretrained)
-  Expert 2: Bass+Mix        (SIMI pretrained)
-  Expert 3: Others+Mix      (SIMI pretrained)
-  Expert 4: Dual-Attention  (Chen et al. / Tsungping pretrained — mixture only)
-
-Key changes vs mmoe_5experts.py (SIMI+AllInOne):
-  - Expert 4 is Dual-Attention instead of All-In-One
-  - Dual-Attention takes only mixture (spec, chromagram) — no stem stack needed
-  - No instruments_mel input required — data pipeline same as attention-towers-mmoe.py
-  - Gradient splitting: all 5 experts → specTNT_layers[-1]
-
-PATHS TO UPDATE (search for  <- UPDATE):
-  DATA_BASE_PATH, CONFIG_PATH, CKPT_VOCALS, CKPT_DRUMS, CKPT_BASS,
-  CKPT_OTHER, CKPT_TSUNGPING, and the module import path for tsungping.
-"""
-
 import os
 import json
 import glob
@@ -53,7 +30,7 @@ if gpus:
 global_frame_size = 0.5
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Import SIMI model class + utilities
+# Import model class + utilities
 # ─────────────────────────────────────────────────────────────────────────────
 from model import (          # <- UPDATE filename if different
     FunctionalSegmentModel,
@@ -89,25 +66,24 @@ def _import_module(name, path):
 
 _tsungping_mod    = _import_module(
     'tsungping_mod',
-    '/Scratch/repository/msa/MSATSUNGPING/tsungping-training-beatles-salami-70.py'  # <- UPDATE
+    '/baselines/train_dual_attention.py' 
 )
 DualAttentionModel = _tsungping_mod.FunctionalSegmentModel
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Checkpoint paths   <- UPDATE ALL FIVE
 # ─────────────────────────────────────────────────────────────────────────────
-DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
-CONFIG_PATH    = "/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_rwc.json"
+DATA_BASE_PATH = "/data/"
+CONFIG_PATH    = "/data/dataset_splits.json"
 
-CKPT_VOCALS = '/Scratch/repository/msa/MSATSUNGPING/vocals_F_rwc/best_models/best-epoch-58-82'
-CKPT_OTHER = '/Scratch/repository/msa/MSATSUNGPING/others_F_rwc/best_models/best-epoch-44-67'
-CKPT_DRUMS = '/Scratch/repository/msa/MSATSUNGPING/drums_F_rwc/best_models/best-epoch-101-127'
-CKPT_BASS = '/Scratch/repository/msa/MSATSUNGPING/bass_F_rwc/best_models/best-epoch-69-91'
-CKPT_TSUNGPING = '/Scratch/repository/msa/MSATSUNGPING/tsungping-model-salami-beatles-70/best_models/best-36'
+CKPT_VOCALS = '/pretrained_Models/vocals//best-epoch-58-82'
+CKPT_OTHER = '/pretrained_Models/others/best-epoch-44-67'
+CKPT_DRUMS = '/pretrained_Models/drums/best-epoch-69-94'
+CKPT_BASS = '/pretrained_Models/bass/best-epoch-69-91'
 
-# ─────────────────────────────────────────────────────────────────────────────
-# SIMI expert: encode methods (unchanged from attention-towers-mmoe.py)
-# ─────────────────────────────────────────────────────────────────────────────
+CKPT_TSUNGPING = '/dual_attention/best-36'
+
+
 
 def _encode_frozen_method(self, spec, chromagram, stem_spec, stem_chromagram, valid_len):
     spec        = tf.math.log(1 + 100 * tf.nn.relu(spec        + 80))
