@@ -62,11 +62,7 @@ functional labeling can weight the expert pool differently at every time frame.
 │   └── mmoe_cv_rwc.py                # train Beatles + SALAMI → test RWC
 │
 ├── analysis/
-│   └── significance_analysis.py      # Multi-seed aggregation + Wilcoxon tests
-│
-└── scripts/
-    ├── run_seed_sweep.sh
-    └── run_ablation_sweep.sh
+     └── significance_analysis.py      # Multi-seed aggregation + Wilcoxon tests
 ```
 
 Pretrained weights are hosted separately — see [Pretrained models](#pretrained-models).
