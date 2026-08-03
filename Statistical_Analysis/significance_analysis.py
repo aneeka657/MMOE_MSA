@@ -1,37 +1,3 @@
-"""
-Multi-seed significance analysis for ISMIR 2026 camera-ready (reviewer item 1).
-
-Inputs: per-track CSVs produced by the seeded training scripts, one per seed
-per system, each with columns:
-    system, seed, song, F1_05, P_05, R_05, F1_3, P_3, R_3,
-    F1_P, P_pair, R_pair, ACCa, ACCs
-
-Usage:
-    python significance_analysis.py \
-        --system-a "mmoe_results_with_rwc/seed_*/best_models/per_track_metrics_seed*.csv" \
-        --name-a MMoE \
-        --system-b "allinone_results/seed_*/best_models/per_track_metrics_seed*.csv" \
-        --name-b All-In-One
-
-Outputs (printed and written to significance_report.txt):
-  1. Per-system mean +/- std across seeds for every paper metric
-     (aggregate = mean over test tracks within a seed, then mean/std over seeds).
-  2. Paired Wilcoxon signed-rank test per metric: for each track, the metric
-     is averaged over seeds within each system, then the two systems are
-     compared pairwise over the N test tracks. A paired t-test is reported
-     alongside for reference.
-  3. A LaTeX-ready "mean +/- std" row for each system, and suggested
-     significance markers.
-
-Statistical choices (state these in the paper):
-  - Wilcoxon signed-rank is the primary test: paired at the track level,
-    non-parametric (per-track F1 distributions are bounded and skewed).
-  - Averaging over seeds before pairing tests the systems' expected
-    performance per track and avoids treating seeds as independent samples.
-  - With 5 primary metrics, note whether conclusions survive a
-    Holm-Bonferroni correction (reported below).
-"""
-
 import argparse
 import glob
 import sys
