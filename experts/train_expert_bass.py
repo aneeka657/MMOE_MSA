@@ -159,7 +159,6 @@ def load_dataset_config(config_path="/data/dataset_splits.json"):
 def create_enhanced_datasets(config_path="/data/dataset_splits.json", 
                            data_base_path="/data/"):  
     
-    print("🎯 Creating datasets following Beatles-centric strategy...")
     
     # Load configuration
     config = load_dataset_config(config_path)
