@@ -1036,18 +1036,19 @@ def create_datasets(config_path, data_base_path):
 
     dataset_paths = {
         'beatles': {
-            'original': os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'beatles-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'beatles_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'beatles_Aug_Preprocessed_Data'),
         },
         'salami': {
-            'original': os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'salami-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'SALAMI_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'SALAMI_Aug_Preprocessed_Data'),
         },
         'rwc': {
-        'original': os.path.join(data_base_path, 'rwc-original-preprocessed-data'),
-        'aug':      os.path.join(data_base_path, 'rwc-aug-preprocessed-data'),
+        'original': os.path.join(data_base_path, 'RWC_Original_Preprocessed_Data'),
+        'aug':      os.path.join(data_base_path, 'RWC_Aug_Preprocessed_Data'),
         },
     }
+    
 
     all_keys = [
         'spec', 'chromagram',
