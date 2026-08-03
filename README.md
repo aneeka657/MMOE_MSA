@@ -187,9 +187,7 @@ python mmoe/train_mmoe_seeded.py --gating uniform   # fixed 1/N mixing
 
 ## Pretrained models
 
-Expert checkpoints and the trained MMoE model:
-
-**(Zenodo DOI — to be added)**
+Expert checkpointsl:
 
 ```
 Pretrained_Models/
