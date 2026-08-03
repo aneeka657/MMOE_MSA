@@ -1,38 +1,3 @@
-"""
-MMoE Music Structure Analysis — Option A: Partial Unfreeze
-============================================================
-Extends the SIMI framework (my-training-vocals.py) with Multi-gate Mixture-of-Experts.
-
-Key change vs attention-towers-mmoe.py:
-  The LAST SpecTNT layer of each expert is unfrozen and fine-tuned jointly with
-  the gates and towers. This allows the expert representations to adapt to the
-  multi-task signal instead of being rigidly frozen, breaking the representation
-  saturation ceiling seen in all fully-frozen variants.
-
-Architecture:
-  - 4 frozen SIMI experts: Vocals+Mix, Drums+Mix, Bass+Mix, Others+Mix
-  - Each expert's enc_FCT [B, T, 80] is extracted as its "opinion"
-  - Two lightweight TaskGate networks (one for boundary, one for labeling)
-    each produce a softmax weight over the 4 experts
-  - The weighted-sum fused representation goes to two task-specific towers
-  - All loss functions, metrics, decoding, checkpointing, CSV logging, and
-    prediction saving are identical to my-training-vocals.py
-
-Data requirements per song (same folder structure as SIMI preprocessing):
-  mix:    *_spec.npy, *_chroma.npy
-  vocal:  *_vocalspec.npy,  *_vocalchroma.npy
-  drum:   *_drumspec.npy,   *_drumchroma.npy
-  bass:   *_bassspec.npy,   *_basschroma.npy
-  other:  *_otherspec.npy,  *_otherchroma.npy
-  labels: *_boundary.npy, *_function.npy, *_section.npy
-
-Usage:
-  python mmoe_training.py
-
-PATHS TO UPDATE (search for <- UPDATE):
-  DATA_BASE_PATH, CONFIG_PATH, and 4 SIMI checkpoint paths
-"""
-
 import os
 import json
 import glob
@@ -50,7 +15,7 @@ import csv
 from datetime import datetime
 
 # ─────────────────────────────────────────────────────────────────────────────
-# GPU setup  (same as your SIMI file)
+# GPU setup  
 # ─────────────────────────────────────────────────────────────────────────────
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
@@ -67,12 +32,8 @@ if gpus:
 global_frame_size = 0.5
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Import your existing SIMI classes
+# Import Model classes
 # ─────────────────────────────────────────────────────────────────────────────
-# We need FunctionalSegmentModel and all its supporting classes.
-# The cleanest way: just import them from your vocals training file.
-# Make sure my_training_vocals.py is in the same directory (or on PYTHONPATH).
-# NOTE: rename the file below to match your actual filename exactly.
 
 from model import (          # <- UPDATE filename if different
     FunctionalSegmentModel,
@@ -98,8 +59,8 @@ from model import (          # <- UPDATE filename if different
 # ─────────────────────────────────────────────────────────────────────────────
 # Paths
 # ─────────────────────────────────────────────────────────────────────────────
-DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
-CONFIG_PATH    = "/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_rwc.json"
+DATA_BASE_PATH = "/data/"
+CONFIG_PATH    = "/data/datasets_beatles_salami_rwc.json"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Cross-dataset validation setting  <- CHANGE THIS BEFORE EACH RUN
@@ -112,10 +73,11 @@ HELD_OUT = 'beatles'   # <- CHANGE THIS per run
 # ─────────────────────────────────────────────────────────────────────────────
 # RWC-trained expert checkpoints
 # ─────────────────────────────────────────────────────────────────────────────
-CKPT_VOCALS = '/Scratch/repository/msa/MSATSUNGPING/vocals_F_rwc/best_models/best-epoch-58-82'
-CKPT_DRUMS  = '/Scratch/repository/msa/MSATSUNGPING/drums_F_rwc/best_models/best-epoch-69-94'
-CKPT_BASS   = '/Scratch/repository/msa/MSATSUNGPING/bass_F_rwc/best_models/best-epoch-69-91'
-CKPT_OTHER  = '/Scratch/repository/msa/MSATSUNGPING/others_F_rwc/best_models/best-epoch-44-67'
+
+CKPT_VOCALS = '/pretrained_Models/vocals//best-epoch-58-82'
+CKPT_OTHER = '/pretrained_Models/others/best-epoch-44-67'
+CKPT_DRUMS = '/pretrained_Models/drums/best-epoch-69-94'
+CKPT_BASS = '/pretrained_Models/bass/best-epoch-69-91'
 
 
 
@@ -1157,21 +1119,20 @@ def create_multistem_datasets(config_path, data_base_path, held_out='rwc'):
 
     dataset_paths = {
         'beatles': {
-            'original': os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'beatles-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'beatles_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'beatles_Aug_Preprocessed_Data'),
         },
         'salami': {
-            'original': os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'salami-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'SALAMI_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'SALAMI_Aug_Preprocessed_Data'),
         },
         'rwc': {
-            'original': os.path.join(data_base_path, 'rwc-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'rwc-aug-preprocessed-data'),
+        'original': os.path.join(data_base_path, 'RWC_Original_Preprocessed_Data'),
+        'aug':      os.path.join(data_base_path, 'RWC_Aug_Preprocessed_Data'),
         },
     }
-
-    # Collect ALL song IDs per dataset — merging training_set + test_set from JSON
-    # so every available song is used (not the old 70/30 random split)
+  
+    
     all_song_ids = {}
     for dataset_name in ['beatles', 'salami', 'rwc']:
         ids = []
