@@ -1,0 +1,8 @@
+model_checkpoint_path: "best-4"
+all_model_checkpoint_paths: "best-1"
+all_model_checkpoint_paths: "best-2"
+all_model_checkpoint_paths: "best-4"
+all_model_checkpoint_timestamps: 1756970623.661385
+all_model_checkpoint_timestamps: 1756973403.4493902
+all_model_checkpoint_timestamps: 1756973918.832267
+last_preserved_timestamp: 1756970084.1190703
