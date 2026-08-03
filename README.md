@@ -110,7 +110,7 @@ filtered and temporally downsampled by 20x, giving 0.5 s per frame (2 fps).
 Sequences are capped at 935 frames.
 
 **Splits.** The track-level train/test split is fixed in
-`splits/train_test_split.json`. Training tracks are augmented by pitch shifting
+`/data/dataset_splits.json`. Training tracks are augmented by pitch shifting
 (±2 semitones) and pre-emphasis filtering (0.95, 0.97); test tracks are never
 augmented. The same preprocessing code is used for every dataset and every stem.
 
