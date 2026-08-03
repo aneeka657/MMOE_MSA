@@ -1,28 +1,3 @@
-"""
-MMoE Music Structure Analysis — 5 Experts
-==========================================
-Professor's experiment: 4 SIMI stem experts + 1 All-In-One expert.
-
-Experts:
-  Expert 0: Vocals+Mix   (SIMI pretrained)
-  Expert 1: Drums+Mix    (SIMI pretrained)
-  Expert 2: Bass+Mix     (SIMI pretrained)
-  Expert 3: Others+Mix   (SIMI pretrained)
-  Expert 4: All-In-One   (Kim & Nam 2023 pretrained)
-
-Key changes vs attention-towers-mmoe.py:
-  - 5 experts instead of 4  (n_experts=5, gates output [B,T,5])
-  - All-In-One takes stacked 4-stem specs [B,4,T,80], hidden dim=24 → projected to 80
-  - Data pipeline: keeps all stem specs+chromagrams (for SIMI experts)
-                   AND stacks instruments_mel [4,T,80] (for All-In-One)
-  - Gradient splitting: SIMI experts → specTNT_layers[-1]
-                        All-In-One  → blocks[-1] + proj_to_80
-
-PATHS TO UPDATE (search for  <- UPDATE):
-  DATA_BASE_PATH, CONFIG_PATH, CKPT_VOCALS, CKPT_DRUMS, CKPT_BASS,
-  CKPT_OTHER, CKPT_ALLINONE, and the 3 module import paths.
-"""
-
 import os
 import json
 import glob
@@ -55,7 +30,7 @@ if gpus:
 global_frame_size = 0.5
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Import SIMI model class + utilities
+# Import model class + utilities
 # ─────────────────────────────────────────────────────────────────────────────
 from model import (          # <- UPDATE filename if different
     FunctionalSegmentModel,
@@ -91,7 +66,7 @@ def _import_module(name, path):
 
 _allinone_mod = _import_module(
     'allinone_mod',
-    '/Scratch/repository/msa/MSATSUNGPING/all-in-one.py'   # <- UPDATE
+    '/baselines/train_allinone.py' 
 )
 AllInOneModel  = _allinone_mod.AllInOneModel
 AllInOneConfig = _allinone_mod.AllInOneConfig
@@ -99,15 +74,15 @@ AllInOneConfig = _allinone_mod.AllInOneConfig
 # ─────────────────────────────────────────────────────────────────────────────
 # Checkpoint paths   <- UPDATE ALL FIVE
 # ─────────────────────────────────────────────────────────────────────────────
-DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
-CONFIG_PATH    = "/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_rwc.json"
+DATA_BASE_PATH = "/data/"
+CONFIG_PATH    = "/data/dataset_splits.json"
 
-CKPT_VOCALS = '/Scratch/repository/msa/MSATSUNGPING/vocals_F_rwc/best_models/best-epoch-58-82'
-CKPT_OTHER = '/Scratch/repository/msa/MSATSUNGPING/others_F_rwc/best_models/best-epoch-44-67'
-CKPT_DRUMS = '/Scratch/repository/msa/MSATSUNGPING/drums_F_rwc/best_models/best-epoch-101-127'
-CKPT_BASS = '/Scratch/repository/msa/MSATSUNGPING/bass_F_rwc/best_models/best-epoch-69-91'
+CKPT_VOCALS = '/pretrained_Models/vocals//best-epoch-58-82'
+CKPT_OTHER = '/pretrained_Models/others/best-epoch-44-67'
+CKPT_DRUMS = '/pretrained_Models/drums/best-epoch-69-94'
+CKPT_BASS = '/pretrained_Models/bass/best-epoch-69-91'
 
-CKPT_ALLINONE = '/Scratch/repository/msa/MSATSUNGPING/allinone_baseline_model/best_models/best-4'  # <- UPDATE
+CKPT_ALLINONE = '/All_in_One/best-4' 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SIMI expert: encode methods (unchanged from attention-towers-mmoe.py)
