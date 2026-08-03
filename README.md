@@ -122,10 +122,10 @@ augmented. The same preprocessing code is used for every dataset and every stem.
 
 ```bash
 # Stage 1 — train the four experts (or download pretrained weights)
-python experts/train_expert_vocals.py
-python experts/train_expert_drums.py
-python experts/train_expert_bass.py
-python experts/train_expert_others.py
+python experts/train_expert_vocals.py --variance v2
+python experts/train_expert_drums.py --variance v2
+python experts/train_expert_bass.py --variance v2
+python experts/train_expert_others.py --variance v2
 
 # Stage 2 — train MMoE on the frozen expert pool
 python mmoe/train_mmoe.py
@@ -185,11 +185,6 @@ python mmoe/train_mmoe_seeded.py --gating static    # learned per-task weights, 
 python mmoe/train_mmoe_seeded.py --gating uniform   # fixed 1/N mixing
 ```
 
-`--drop-expert {vocals,drums,bass,other}` removes one expert for leave-one-out
-analysis.
-
----
-
 ## Pretrained models
 
 Expert checkpoints and the trained MMoE model:
@@ -197,12 +192,11 @@ Expert checkpoints and the trained MMoE model:
 **(Zenodo DOI — to be added)**
 
 ```
-checkpoints/
-├── expert_vocals/
-├── expert_drums/
-├── expert_bass/
-├── expert_others/
-└── mmoe/
+Pretrained_Models/
+├── vocals/
+├── drums/
+├── bass/
+├── others/
 ```
 
 Set the paths in `config.py` after downloading.
