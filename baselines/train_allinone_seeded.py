@@ -9,11 +9,6 @@ from tensorflow.keras import backend
 import mir_eval
 import librosa
 import math
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Multi-seed support (ISMIR 2026 camera-ready, reviewer item 1)
-# Identical mechanism to the seeded MMoE script: same seed values (0-4).
-# ─────────────────────────────────────────────────────────────────────────────
 import argparse
 import random
 
@@ -33,8 +28,8 @@ tf.random.set_seed(SEED)
 print(f'🌱 Global seed set to {SEED}')
 
 # Use GPUs 2 and 3 (the free ones!)
-os.environ.setdefault("CUDA_VISIBLE_DEVICES", "1")
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
 os.environ["TF_XLA_FLAGS"] = "--tf_xla_enable_xla_devices=false"
 os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
 
@@ -104,7 +99,7 @@ def frame2interval(segment_frame, label_frame, frame_size=0.5):
     interval = np.array(list(zip(boundary[:-1], boundary[1:]))) * frame_size
     return interval, label
 
-def load_dataset_config(config_path="/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_full_salami_70_30.json"):
+def load_dataset_config(config_path="/data/dataset_splits.json"):
     with open(config_path, 'r') as f:
         config = json.load(f)
     return config
@@ -976,17 +971,23 @@ def create_enhanced_datasets_allinone_strict(config_path, data_base_path):
     print("Creating STRICT All-In-One datasets (requires all 4 instrument separations)")
     
     config = load_dataset_config(config_path)
-    
+
+
     dataset_paths = {
         'beatles': {
-            'original': os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
-            'aug': os.path.join(data_base_path, 'beatles-aug-preprocessed-data')
+            'original': os.path.join(data_base_path, 'beatles_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'beatles_Aug_Preprocessed_Data'),
         },
         'salami': {
-            'original': os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-            'aug': os.path.join(data_base_path, 'salami-aug-preprocessed-data')
-        }
+            'original': os.path.join(data_base_path, 'SALAMI_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'SALAMI_Aug_Preprocessed_Data'),
+        },
+        'rwc': {
+        'original': os.path.join(data_base_path, 'RWC_Original_Preprocessed_Data'),
+        'aug':      os.path.join(data_base_path, 'RWC_Aug_Preprocessed_Data'),
+        },
     }
+    
     
     def create_train_data_strict():
         all_data = {'instruments_mel': [], 'boundary': [], 'function': [], 'len': [], 'section': []}
@@ -1065,7 +1066,9 @@ def check_instrument_separation_availability(data_base_path):
         os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
         os.path.join(data_base_path, 'beatles-aug-preprocessed-data'),
         os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-        os.path.join(data_base_path, 'salami-aug-preprocessed-data')
+        os.path.join(data_base_path, 'salami-aug-preprocessed-data'),
+        os.path.join(data_base_path, 'rwc-original-preprocessed-data'),
+        os.path.join(data_base_path, 'rwc-aug-preprocessed-data')
     ]
     
     total_files = 0
@@ -1221,11 +1224,11 @@ def train_tensorflow_allinone():
     print("🎯 Starting TensorFlow All-in-One Approximation Training")
     print("(Windowed attention approximates neighborhood attention)")
     
-    DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
+    DATA_BASE_PATH = "/data/"
     
     # Load data using CORRECT function
     train_data, test_data = create_enhanced_datasets_allinone_strict(
-        config_path="/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_full_salami_70_30.json",
+        config_path="/data/dataset_splits.json",
         data_base_path=DATA_BASE_PATH
     )
     
@@ -1290,7 +1293,7 @@ def train_tensorflow_allinone():
     
     # Checkpoint setup
     checkpoint = tf.train.Checkpoint(model=model)
-    model_path = f'./allinone_seed0/seed_{SEED}'
+    model_path = f'./allinone_rwc/seed_{SEED}'
     all_epochs_manager = tf.train.CheckpointManager(
         checkpoint, 
         directory=f'{model_path}/all_epochs', 
@@ -1439,13 +1442,5 @@ def train_tensorflow_allinone():
 
 # CORRECTED main function
 if __name__ == '__main__':
-    print("=== TensorFlow All-in-One Approximation ===")
-    print("Note: This uses windowed attention to approximate neighborhood attention")
-    print("NATTEN library is not required for this implementation")
     
-    train_tensorflow_allinone()  # FIXED: Use correct function name
-
-# if __name__ == "__main__":
-#     # Check your data first
-#     check_instrument_separation_availability("/Scratch/repository/msa/MSATSUNGPING/")
-# # === COMPLETE TRAINING FUNCTION ===
+    train_tensorflow_allinone() 
