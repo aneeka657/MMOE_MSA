@@ -146,14 +146,14 @@ def get_temporal_mask(valid_len, max_len, n_heads=8):
     mask = tf.concat(tf.split(mask, n_heads, axis=1), axis=0) # [hb, 1, n, n]
     return tf.squeeze(mask, axis=1) # [hb, n, n]
 
-def load_dataset_config(config_path="/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_70_30.json"):
+def load_dataset_config(config_path="/data/dataset_splits.json"):
     """Load the dataset selection configuration"""
     with open(config_path, 'r') as f:
         config = json.load(f)
     return config
 
-def create_enhanced_datasets(config_path="/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_70_30.json", 
-                           data_base_path="/Scratch/repository/msa/MSATSUNGPING/"):
+def create_enhanced_datasets(config_path="/data/dataset_splits.json", 
+                           data_base_path="/data/"):
     """
     Create train/test datasets following Claude's Beatles-centric strategy
     MODIFIED: Remove drum features as model2.py doesn't use them
@@ -164,15 +164,20 @@ def create_enhanced_datasets(config_path="/Scratch/repository/msa/MSATSUNGPING/m
     config = load_dataset_config(config_path)
     
     # Data paths - UPDATE THESE IF YOUR FOLDER NAMES ARE DIFFERENT
+
     dataset_paths = {
         'beatles': {
-            'original': os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
-            'aug': os.path.join(data_base_path, 'beatles-aug-preprocessed-data')
+            'original': os.path.join(data_base_path, 'beatles_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'beatles_Aug_Preprocessed_Data'),
         },
         'salami': {
-            'original': os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-            'aug': os.path.join(data_base_path, 'salami-aug-preprocessed-data')
-        }
+            'original': os.path.join(data_base_path, 'SALAMI_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'SALAMI_Aug_Preprocessed_Data'),
+        },
+        'rwc': {
+        'original': os.path.join(data_base_path, 'RWC_Original_Preprocessed_Data'),
+        'aug':      os.path.join(data_base_path, 'RWC_Aug_Preprocessed_Data'),
+        },
     }
     
     # Verify paths exist
@@ -1904,11 +1909,11 @@ class ImprovedEarlyStopping:
 def train():
     print("🎯 Starting Enhanced Beatles-Centric Training with model2.py architecture...")
     
-    DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
+    DATA_BASE_PATH = "/data/"
     
     # Create enhanced datasets (NO DRUMS)
     train_data, test_data = create_enhanced_datasets(
-        config_path="/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_70_30.json",
+        config_path="/data/dataset_splits.json",
         data_base_path=DATA_BASE_PATH
     )
     
@@ -1976,7 +1981,7 @@ def train():
 
     # Checkpoint setup
     checkpoint = tf.train.Checkpoint(model=model)
-    model_path = './tsungping-model-salami-beatles-70'
+    model_path = './dual_attention'
     all_epochs_manager = tf.train.CheckpointManager(
         checkpoint, 
         directory=f'{model_path}/all_epochs', 
