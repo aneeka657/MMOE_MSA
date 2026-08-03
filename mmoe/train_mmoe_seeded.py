@@ -1,38 +1,3 @@
-"""
-MMoE Music Structure Analysis — Option A: Partial Unfreeze
-============================================================
-Extends the SIMI framework (my-training-vocals.py) with Multi-gate Mixture-of-Experts.
-
-Key change vs attention-towers-mmoe.py:
-  The LAST SpecTNT layer of each expert is unfrozen and fine-tuned jointly with
-  the gates and towers. This allows the expert representations to adapt to the
-  multi-task signal instead of being rigidly frozen, breaking the representation
-  saturation ceiling seen in all fully-frozen variants.
-
-Architecture:
-  - 4 frozen SIMI experts: Vocals+Mix, Drums+Mix, Bass+Mix, Others+Mix
-  - Each expert's enc_FCT [B, T, 80] is extracted as its "opinion"
-  - Two lightweight TaskGate networks (one for boundary, one for labeling)
-    each produce a softmax weight over the 4 experts
-  - The weighted-sum fused representation goes to two task-specific towers
-  - All loss functions, metrics, decoding, checkpointing, CSV logging, and
-    prediction saving are identical to my-training-vocals.py
-
-Data requirements per song (same folder structure as SIMI preprocessing):
-  mix:    *_spec.npy, *_chroma.npy
-  vocal:  *_vocalspec.npy,  *_vocalchroma.npy
-  drum:   *_drumspec.npy,   *_drumchroma.npy
-  bass:   *_bassspec.npy,   *_basschroma.npy
-  other:  *_otherspec.npy,  *_otherchroma.npy
-  labels: *_boundary.npy, *_function.npy, *_section.npy
-
-Usage:
-  python mmoe_training.py
-
-PATHS TO UPDATE (search for <- UPDATE):
-  DATA_BASE_PATH, CONFIG_PATH, and 4 SIMI checkpoint paths
-"""
-
 import os
 import json
 import glob
@@ -48,10 +13,6 @@ import math
 import pandas as pd
 import csv
 from datetime import datetime
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Multi-seed support (ISMIR 2026 camera-ready, reviewer item 1)
-# ─────────────────────────────────────────────────────────────────────────────
 import argparse
 import random
 
@@ -90,9 +51,7 @@ print(f'🌱 Global seed set to {SEED}'
       + (' (deterministic ops ON)' if _args.deterministic else ''))
 print(f'⚙️  Gating variant: {GATING}   |   Dropped expert: {DROP_EXPERT}')
 
-# ─────────────────────────────────────────────────────────────────────────────
-# GPU setup  (same as your SIMI file)
-# ─────────────────────────────────────────────────────────────────────────────
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
 os.environ["TF_XLA_FLAGS"] = "--tf_xla_enable_xla_devices=false"
@@ -106,14 +65,6 @@ if gpus:
         tf.config.experimental.set_memory_growth(gpu, True)
 
 global_frame_size = 0.5
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Import your existing SIMI classes
-# ─────────────────────────────────────────────────────────────────────────────
-# We need FunctionalSegmentModel and all its supporting classes.
-# The cleanest way: just import them from your vocals training file.
-# Make sure my_training_vocals.py is in the same directory (or on PYTHONPATH).
-# NOTE: rename the file below to match your actual filename exactly.
 
 from model import (          # <- UPDATE filename if different
     FunctionalSegmentModel,
@@ -139,28 +90,13 @@ from model import (          # <- UPDATE filename if different
 # ─────────────────────────────────────────────────────────────────────────────
 # Paths  <- UPDATE ALL FOUR CHECKPOINT PATHS
 # ─────────────────────────────────────────────────────────────────────────────
-DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"                                            # <- UPDATE
-CONFIG_PATH    = "/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_rwc.json"    # <- UPDATE
+DATA_BASE_PATH = "/data/"                                           
+CONFIG_PATH    = "/data/dataset_splits.json"    
 
-# Best checkpoint paths from your four pretrained SIMI models.
-# Point to the path prefix used when saving, e.g.:
-#   "./vocals_full_salami/best_models/best-epoch-42"
-# (TensorFlow will find best-epoch-42.index + best-epoch-42.data-00000-of-00001)
-
-
-
-# CKPT_VOCALS = '/Scratch/repository/msa/MSATSUNGPING/vocals_salami_146_again/best_models/best-epoch-139-167'
-# CKPT_VOCALS ='/Scratch/repository/msa/MSATSUNGPING/vocals_salami_146_again/best_models/best-epoch-139-167'
-# CKPT_DRUMS  ='/Scratch/repository/msa/MSATSUNGPING/drums_300_again/best_models/best-epoch-122-146'
-# CKPT_BASS   ='/Scratch/repository/msa/MSATSUNGPING/bass-full-model/best_models/best-epoch-106-139'
-# CKPT_OTHER  = '/Scratch/repository/msa/MSATSUNGPING/others_300_again/best_models/best-epoch-68-86'
-
-
-CKPT_VOCALS = '/Scratch/repository/msa/MSATSUNGPING/vocals_F_rwc/best_models/best-epoch-58-82'
-CKPT_OTHER = '/Scratch/repository/msa/MSATSUNGPING/others_F_rwc/best_models/best-epoch-44-67'
-CKPT_DRUMS = '/Scratch/repository/msa/MSATSUNGPING/drums_F_rwc/best_models/best-epoch-69-94'
-CKPT_BASS = '/Scratch/repository/msa/MSATSUNGPING/bass_F_rwc/best_models/best-epoch-69-91'
-
+CKPT_VOCALS = '/pretrained_Models/vocals//best-epoch-58-82'
+CKPT_OTHER = '/pretrained_Models/others/best-epoch-44-67'
+CKPT_DRUMS = '/pretrained_Models/drums/best-epoch-69-94'
+CKPT_BASS = '/pretrained_Models/bass/best-epoch-69-91'
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1218,16 +1154,16 @@ def create_multistem_datasets(config_path, data_base_path):
 
     dataset_paths = {
         'beatles': {
-            'original': os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'beatles-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'beatles_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'beatles_Aug_Preprocessed_Data'),
         },
         'salami': {
-            'original': os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'salami-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'SALAMI_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'SALAMI_Aug_Preprocessed_Data'),
         },
         'rwc': {
-        'original': os.path.join(data_base_path, 'rwc-original-preprocessed-data'),
-        'aug':      os.path.join(data_base_path, 'rwc-aug-preprocessed-data'),
+        'original': os.path.join(data_base_path, 'RWC_Original_Preprocessed_Data'),
+        'aug':      os.path.join(data_base_path, 'RWC_Aug_Preprocessed_Data'),
         },
     }
 
@@ -1331,7 +1267,7 @@ def make_tf_dataset(data):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Prediction saver for MMoE (same CSV format as SIMI + gate weights CSV)
+# Prediction saver for MMoE 
 # ─────────────────────────────────────────────────────────────────────────────
 
 class MMoEPredictionSaver:
