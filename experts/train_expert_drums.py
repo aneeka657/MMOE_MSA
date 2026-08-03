@@ -150,27 +150,15 @@ def get_temporal_mask(valid_len, max_len, n_heads=8):
     mask = tf.concat(tf.split(mask, n_heads, axis=1), axis=0) # [hb, 1, n, n]
     return tf.squeeze(mask, axis=1) # [hb, n, n]
 
-def load_dataset_config(config_path="/Scratch/repository/msa/MSATSUNGPING/dataset_beatles_salami_splits.json"):
+def load_dataset_config(config_path="/data/dataset_splits.json"):
     """Load the dataset selection configuration"""
     with open(config_path, 'r') as f:
         config = json.load(f)
     return config
 
-def create_enhanced_datasets(config_path="/Scratch/repository/msa/MSATSUNGPING/dataset_beatles_salami_splits.json", 
-                           data_base_path="/Scratch/repository/msa/MSATSUNGPING/"):  # UPDATE THIS PATH TO YOUR DATA DIRECTORY
-    """
-    Create train/test datasets following Claude's Beatles-centric strategy
+def create_enhanced_datasets(config_path="/data/dataset_splits.json", 
+                           data_base_path="/data/"):  # UPDATE THIS PATH TO YOUR DATA DIRECTORY
     
-    Args:
-        config_path: Path to your fixed_dataset_selection.json file
-        data_base_path: Parent directory containing your 6 preprocessed folders:
-                       - beatles-original-preprocessed-data
-                       - beatles-aug-preprocessed-data  
-                       - salami-original-preprocessed-data
-                       - salami-aug-preprocessed-data
-                       - harmonix-original-preprocessed-data
-                       - harmonix-aug-preprocessed-data
-    """
     print("🎯 Creating datasets following Beatles-centric strategy...")
     
     # Load configuration
@@ -179,15 +167,19 @@ def create_enhanced_datasets(config_path="/Scratch/repository/msa/MSATSUNGPING/d
     # Data paths - UPDATE THESE IF YOUR FOLDER NAMES ARE DIFFERENT
     dataset_paths = {
         'beatles': {
-            'original': os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
-            'aug': os.path.join(data_base_path, 'beatles-aug-preprocessed-data')
+            'original': os.path.join(data_base_path, 'beatles_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'beatles_Aug_Preprocessed_Data'),
         },
         'salami': {
-            'original': os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-            'aug': os.path.join(data_base_path, 'salami-aug-preprocessed-data')
-        }
-        
+            'original': os.path.join(data_base_path, 'SALAMI_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'SALAMI_Aug_Preprocessed_Data'),
+        },
+        'rwc': {
+        'original': os.path.join(data_base_path, 'RWC_Original_Preprocessed_Data'),
+        'aug':      os.path.join(data_base_path, 'RWC_Aug_Preprocessed_Data'),
+        },
     }
+                                                 
     
     # Verify paths exist
     print("🔍 Verifying data paths...")
@@ -1732,11 +1724,11 @@ def train_v2_cross_modal_only():
     """
     print("🔵 TRAINING V2: Cross-Modal Attention Only")
     
-    DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
+    DATA_BASE_PATH = "/data/"
     
     # Create enhanced datasets
     train_data, test_data = create_enhanced_datasets(
-        config_path="/Scratch/repository/msa/MSATSUNGPING/dataset_beatles_salami_splits.json",
+        config_path="/data/dataset_splits.json",
         data_base_path=DATA_BASE_PATH
     )
     
@@ -2057,11 +2049,11 @@ def train_v3_full_model():
     """
     print("🟢 TRAINING V3: Full Model")
     
-    DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
+    DATA_BASE_PATH = "/data/"
     
     # Create enhanced datasets
     train_data, test_data = create_enhanced_datasets(
-        config_path="/Scratch/repository/msa/MSATSUNGPING/dataset_beatles_salami_splits.json",
+        config_path="/data/dataset_splits.json",
         data_base_path=DATA_BASE_PATH
     )
     
