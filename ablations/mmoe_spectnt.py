@@ -1,26 +1,3 @@
-"""
-MMoE Music Structure Analysis — 5 Experts (SIMI + SpecTNT)
-==============================================================
-Professor's experiment: 4 SIMI stem experts + 1 SpecTNT-Attention expert.
-
-Experts:
-  Expert 0: Vocals+Mix      (SIMI pretrained)
-  Expert 1: Drums+Mix       (SIMI pretrained)
-  Expert 2: Bass+Mix        (SIMI pretrained)
-  Expert 3: Others+Mix      (SIMI pretrained)
-  Expert 4: SpecTNT-Attention  (Wang et al. 2022 pretrained — mixture only)
-
-Key changes vs mmoe_5experts.py (SIMI+AllInOne):
-  - Expert 4 is SpecTNT-Attention instead of All-In-One
-  - SpecTNT takes only mixture (spec, chromagram) — no stem stack needed
-  - No instruments_mel input required — data pipeline same as attention-towers-mmoe.py
-  - Gradient splitting: all 5 experts → specTNT_layers[-1]
-
-PATHS TO UPDATE (search for  <- UPDATE):
-  DATA_BASE_PATH, CONFIG_PATH, CKPT_VOCALS, CKPT_DRUMS, CKPT_BASS,
-  CKPT_OTHER, CKPT_SPECTNT, and the module import path for spectnt.
-"""
-
 import os
 import json
 import glob
@@ -55,7 +32,7 @@ global_frame_size = 0.5
 # ─────────────────────────────────────────────────────────────────────────────
 # Import SIMI model class + utilities
 # ─────────────────────────────────────────────────────────────────────────────
-from model import (          # <- UPDATE filename if different
+from model import (          
     FunctionalSegmentModel,
     shape_list,
     peak_picking_MSAF,
@@ -89,21 +66,23 @@ def _import_module(name, path):
 
 _spectnt_mod  = _import_module(
     'spectnt_mod',
-    '/Scratch/repository/msa/MSATSUNGPING/spectnt-training.py'  # <- UPDATE
+    '/baselines/train_spectnt.py'  
 )
 SpecTNTModel = _spectnt_mod.FunctionalSegmentModel
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Checkpoint paths   <- UPDATE ALL FIVE
+# Checkpoint paths   
 # ─────────────────────────────────────────────────────────────────────────────
-DATA_BASE_PATH = "/Scratch/repository/msa/MSATSUNGPING/"
-CONFIG_PATH    = "/Scratch/repository/msa/MSATSUNGPING/my_dataset_selection_beatles_salami_rwc.json"
 
-CKPT_VOCALS = '/Scratch/repository/msa/MSATSUNGPING/vocals_F_rwc/best_models/best-epoch-58-82'
-CKPT_OTHER = '/Scratch/repository/msa/MSATSUNGPING/others_F_rwc/best_models/best-epoch-44-67'
-CKPT_DRUMS = '/Scratch/repository/msa/MSATSUNGPING/drums_F_rwc/best_models/best-epoch-101-127'
-CKPT_BASS = '/Scratch/repository/msa/MSATSUNGPING/bass_F_rwc/best_models/best-epoch-69-91'
-CKPT_SPECTNT   = '/Scratch/repository/msa/MSATSUNGPING/beatles_salami_spectnt_baseline/best_models/best-76'
+DATA_BASE_PATH = "/data/"                                            
+CONFIG_PATH    = "/data/dataset_splits.json"    
+
+CKPT_VOCALS = '/pretrained_Models/vocals//best-epoch-58-82'
+CKPT_OTHER = '/pretrained_Models/others/best-epoch-44-67'
+CKPT_DRUMS = '/pretrained_Models/drums/best-epoch-69-94'
+CKPT_BASS = '/pretrained_Models/bass/best-epoch-69-91'
+
+CKPT_SPECTNT   = '/SpecTNT/best-76'
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SIMI expert: encode methods (unchanged from attention-towers-mmoe.py)
@@ -1056,18 +1035,19 @@ def create_datasets(config_path, data_base_path):
 
     dataset_paths = {
         'beatles': {
-            'original': os.path.join(data_base_path, 'beatles-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'beatles-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'beatles_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'beatles_Aug_Preprocessed_Data'),
         },
         'salami': {
-            'original': os.path.join(data_base_path, 'salami-original-preprocessed-data'),
-            'aug':      os.path.join(data_base_path, 'salami-aug-preprocessed-data'),
+            'original': os.path.join(data_base_path, 'SALAMI_Original_Preprocessed_Data'),
+            'aug':      os.path.join(data_base_path, 'SALAMI_Aug_Preprocessed_Data'),
         },
         'rwc': {
-        'original': os.path.join(data_base_path, 'rwc-original-preprocessed-data'),
-        'aug':      os.path.join(data_base_path, 'rwc-aug-preprocessed-data'),
+        'original': os.path.join(data_base_path, 'RWC_Original_Preprocessed_Data'),
+        'aug':      os.path.join(data_base_path, 'RWC_Aug_Preprocessed_Data'),
         },
     }
+  
 
     all_keys = [
         'spec', 'chromagram',
